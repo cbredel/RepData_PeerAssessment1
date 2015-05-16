@@ -7,15 +7,34 @@ output:
 
 
 ## Loading and preprocessing the data
+ setwd("C:/_data/_Multimedia/mooc_reproductible_research/Assign1/RepData_PeerAssessment1-master")
+ 
+ unzip(zipfile="activity.zip")
+
+ df<-read.csv2("activity.csv",sep="," )
+
+df$date<-as.Date(df$date,format="%Y-%m-%d")
+
 
 
 
 ## What is mean total number of steps taken per day?
+df.date<-aggregate(df[1],list(df$date),sum)
+colnames(df.date)<-c('date','steps')
+mean(df.date$steps,na.rm=TRUE)
+##barplot(df.date$steps, names.arg = df.date$date, xlab = "date", ylab = "steps")
 
+hist(df.date$steps, main = paste("Total Steps Each Day"), col="blue", xlab="Number of Steps")
+
+mean(df.date$steps,na.rm=TRUE)
+
+median(df.date$steps,na.rm=TRUE)
 
 
 ## What is the average daily activity pattern?
-
+df.steps<-aggregate(df[1],list(df$interval),mean,na.rm=TRUE)
+colnames(df.steps)<-c('interval','steps')
+plot(df.steps$interval,df.steps$steps,type='l', xlab="Interval", ylab="Number of Steps",main="Average Number of Steps per Day by Interval")
 
 
 ## Imputing missing values
