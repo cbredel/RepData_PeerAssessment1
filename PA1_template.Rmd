@@ -7,38 +7,82 @@ output:
 
 
 ## Loading and preprocessing the data
- setwd("C:/_data/_Multimedia/mooc_reproductible_research/Assign1/RepData_PeerAssessment1-master")
- 
- unzip(zipfile="activity.zip")
 
- df<-read.csv2("activity.csv",sep="," )
+Unzip the file, load it.
 
+
+```{r, echo=TRUE}
+unzip(zipfile="activity.zip")
+df<-read.csv2("activity.csv",sep="," )
+```
+Change the data type for date 
+```{r, echo=TRUE}
 df$date<-as.Date(df$date,format="%Y-%m-%d")
 
-
+```
 
 
 ## What is mean total number of steps taken per day?
+
+Aggregate date by date
+```{r, echo=TRUE}
 df.date<-aggregate(df[1],list(df$date),sum)
 colnames(df.date)<-c('date','steps')
-mean(df.date$steps,na.rm=TRUE)
-##barplot(df.date$steps, names.arg = df.date$date, xlab = "date", ylab = "steps")
+```
 
+Draw Histogram 
+```{r, echo=TRUE}
 hist(df.date$steps, main = paste("Total Steps Each Day"), col="blue", xlab="Number of Steps")
+```
 
+Mean of steps by day
+```{r, echo=TRUE}
 mean(df.date$steps,na.rm=TRUE)
+```
 
+Median of steps by day
+```{r, echo=TRUE}
 median(df.date$steps,na.rm=TRUE)
-
+```
 
 ## What is the average daily activity pattern?
+
+Mean of steps by interval by days
+```{r, echo=TRUE}
 df.steps<-aggregate(df[1],list(df$interval),mean,na.rm=TRUE)
 colnames(df.steps)<-c('interval','steps')
-plot(df.steps$interval,df.steps$steps,type='l', xlab="Interval", ylab="Number of Steps",main="Average Number of Steps per Day by Interval")
+```
 
+Plot the average daily activity
+```{r, echo=TRUE}
+plot(df.steps$interval,df.steps$steps,type='l', xlab="Interval", ylab="Number of Steps",main="Average Number of Steps per Day by Interval")
+```
+
+Which Interval is the maximum average of steps
+```{r, echo=TRUE}
+df.steps[which.max(df.steps$steps),]$interval
+```
 
 ## Imputing missing values
+Sorry, I do nothing here
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Determine if the date corresponding to a day of week or a week-end. 
+
+I don't use the recommand function because I had a problem of location (I'm french and the day of week were in French !!). So, i used the POSIXlt function. 
+
+```{r, echo=TRUE}
+df$day_type<-ifelse(as.POSIXlt(df$date)$wday %in% c(0,6),'week-end','week_day')
+df.steps2<-aggregate(df[1],list(df$interval,df$day_type),mean,na.rm=TRUE)
+colnames(df.steps2)<-c('interval','day_type','steps')
+```
+
+Plot the two activities graphs
+```{r, echo=TRUE}
+library(lattice)
+ xyplot(df.steps2$steps ~ df.steps2$interval|df.steps2$day_type, main="Average Steps per Day by Interval",xlab="Interval", ylab="Steps",layout=c(1,2), type="l")
+
+```
